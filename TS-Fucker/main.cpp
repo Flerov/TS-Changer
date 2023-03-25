@@ -484,51 +484,6 @@ void UnloadSymbols(symbol_ctx* ctx, BOOL delete_pdb) {
 	free(ctx);
 }
 
-void FindDriver(DWORD64 address) {
-
-	LPVOID drivers[1024];
-	DWORD cbNeeded;
-	int cDrivers, i;
-	DWORD64 diff[3][200];
-	TCHAR szDriver[1024];
-
-	if (EnumDeviceDrivers(drivers, sizeof(drivers), &cbNeeded) && cbNeeded < sizeof(drivers)) {
-		int n = sizeof(drivers) / sizeof(drivers[0]);
-		cDrivers = cbNeeded / sizeof(drivers[0]);
-		int narrow = 0;
-		int c = 0;
-		for (i = 0; i < cDrivers; i++) {
-			//we add all smaller addresses of drivers to a new array, then grab the closest. Not great, I know...
-			if (address > (DWORD64)drivers[i]) {
-				diff[0][c] = address;
-				diff[1][c] = address - (DWORD64)drivers[i];
-				diff[2][c] = (DWORD64)drivers[i];
-				c++;
-			}
-		}
-	}
-	//cheeky for loop to find the smallest diff. smallest diff should be the diff of DriverBase + Diff == Callback function.
-	int k = 0;
-	DWORD64 temp = diff[1][0];
-	for (k = 0; k < cDrivers; k++) {
-		if ((temp > diff[1][k]) && (diff[0][k] == address)) {
-			temp = diff[1][k];
-
-		}
-	}
-
-	if (GetDeviceDriverBaseName(LPVOID(address - temp), szDriver, sizeof(szDriver))) {
-		std::cout << "[+] " << std::hex << address << " [";
-		std::wcout << szDriver << " + 0x";
-		std::cout << std::hex << (int)temp;
-		std::cout << "]" << std::endl;
-	}
-	else {
-		printf("[!] Could not resolve driver for %p\n", address);
-	}
-
-}
-
 void patchSignMode(DBUTIL* ExploitManager, DWORD64 ciBaseAddress, bool status) {
 	LPTSTR ciPath;
 	TCHAR g_ciPath[MAX_PATH] = { 0 };
