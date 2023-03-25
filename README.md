@@ -10,5 +10,5 @@ TS-Fucker.exe 0
 
 ### About
 In my Project I abuse a security vulnerability inside of the appended dbutil_2_3.sys Driver to gain Read/Write Power
-in order to alter the machines current state. < /br>
+in order to alter the machines current state without having to restart the machine. < /br>
 In order for the program to run the driver has to be loaded ie via ManualMapping or using the OSRLoader-Tool
